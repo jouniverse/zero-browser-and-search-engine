@@ -6,15 +6,28 @@ from storage import DBStorage
 from datetime import datetime
 from urllib.parse import quote_plus
 
-def search_api(query, pages=int(RESULT_COUNT/10)):
+
+def search_api(query, pages=int(RESULT_COUNT / 10)):
+    """
+    Perform a Google custom search and return the results as a pandas DataFrame.
+
+    Parameters
+    ----------
+    query : str
+        The query to search for.
+    pages : int
+        The number of pages of results to return. Defaults to RESULT_COUNT/10.
+
+    Returns
+    -------
+    res_df : pandas.DataFrame
+        A DataFrame with columns "link", "rank", "snippet", and "title".
+    """
     results = []
     for i in range(0, pages):
-        start = i*10+1
+        start = i * 10 + 1
         url = SEARCH_URL.format(
-            key=SEARCH_KEY,
-            cx=SEARCH_ID,
-            query=quote_plus(query),
-            start=start
+            key=SEARCH_KEY, cx=SEARCH_ID, query=quote_plus(query), start=start
         )
         response = requests.get(url)
         data = response.json()
@@ -24,7 +37,22 @@ def search_api(query, pages=int(RESULT_COUNT/10)):
     res_df = res_df[["link", "rank", "snippet", "title"]]
     return res_df
 
+
 def scrape_page(links):
+    """
+    Scrape the HTML from a list of links.
+
+    Parameters
+    ----------
+    links : list
+        A list of URLs to scrape.
+
+    Returns
+    -------
+    html : list
+        A list of HTML strings, one for each link. If a link fails to load,
+        an empty string will be returned instead.
+    """
     html = []
     for link in links:
         print(link)
@@ -35,7 +63,25 @@ def scrape_page(links):
             html.append("")
     return html
 
+
 def search(query):
+    """
+    Search for a query in the database or via the Google Custom Search API.
+
+    Parameters
+    ----------
+    query : str
+        The search query to look for.
+
+    Returns
+    -------
+    pandas.DataFrame
+        A DataFrame containing search results with columns: "query", "rank",
+        "link", "title", "snippet", "html", and "created".
+        If the query results are found in the database, they are returned directly.
+        If not, the function fetches and stores the results using the API.
+    """
+
     columns = ["query", "rank", "link", "title", "snippet", "html", "created"]
     storage = DBStorage()
 
