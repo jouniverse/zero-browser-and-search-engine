@@ -1,0 +1,14 @@
+__pycache__
+zero-search-engine/__pycache__
+notes/
+venv/
+.vscode/
+*.zip
+.DS_Store
+.cursorrules
+*.ai
+*.psd
+zero-search-engine/google_api_usage.py
+zero-search-engine/private.py
+zero-search-engine/links.db
+
