@@ -32,6 +32,10 @@ class WebEnginePage(QWebEnginePage):
         self._active_downloads = set()
 
     def createWindow(self, _type):
+        """
+        Handle a request for a new window. If the parent is a SimpleWebBrowser,
+        create a new tab. Otherwise, return None.
+        """
         main_window = self.view().window()
         if isinstance(main_window, SimpleWebBrowser):
             new_view = QWebEngineView()
@@ -42,6 +46,12 @@ class WebEnginePage(QWebEnginePage):
         return None
 
     def contextMenuEvent(self, event):
+        """
+        Reimplemented context menu to include the most common actions.
+        Also adds some link and image specific actions.
+
+        :param event: The event that triggered the context menu.
+        """
         menu = QMenu()
         hit_result = self.contextMenuData()
 
@@ -116,9 +126,30 @@ class WebEnginePage(QWebEnginePage):
 
     def javaScriptConsoleMessage(self, level, message, line, source):
         # Suppress console messages
+        """
+        Suppress console messages.
+
+        We intentionally do nothing here to prevent console messages from being
+        printed to the terminal.
+
+        :param level: The level of the message
+        :type level: QWebEngineView.JavaScriptConsoleMessageLevel
+        :param message: The message
+        :type message: str
+        :param line: The line number
+        :type line: int
+        :param source: The source of the message
+        :type source: str
+        """
         pass
 
     def handle_download(self, download):
+        """
+        Handle a download request.
+
+        :param download: The download request
+        :type download: QWebEngineDownloadItem
+        """
         # Clean up completed downloads
         self._active_downloads = {
             d for d in self._active_downloads if not d.isFinished()
@@ -386,24 +417,44 @@ class SimpleWebBrowser(QMainWindow):
         return self.add_new_tab_with_view(browser)
 
     def close_tab(self, i):
+        """
+        Close the tab at the given index.
+
+        If there is only one tab, don't do anything.
+        """
         if self.tabs.count() < 2:
             return  # Don't close if it's the last tab
 
         self.tabs.removeTab(i)
 
     def current_tab_changed(self, i):
+        """
+        Called when the current tab has changed.
+
+        If the index is valid, get the URL of the current tab and update
+        the URL bar.
+        """
         if i >= 0:
             browser = self.tabs.widget(i)
             self.url_bar.setText(browser.url().toString())
             self.url_bar.setCursorPosition(0)
 
     def navigate_back(self):
+        """
+        Navigate the current tab to the previous page in the navigation history.
+        """
         self.tabs.currentWidget().back()
 
     def navigate_forward(self):
+        """
+        Navigate the current tab to the next page in the navigation history.
+        """
         self.tabs.currentWidget().forward()
 
     def refresh_page(self):
+        """
+        Reloads the current tab in the browser.
+        """
         self.tabs.currentWidget().reload()
 
     def navigate_home(self):
@@ -448,10 +499,25 @@ class SimpleWebBrowser(QMainWindow):
         # else: progress == 0 (or error), handled by statusBarMessage
 
     def stop_loading(self):
+        """
+        Stop loading the current tab when the user clicks the stop button.
+
+        This method forwards the request to the current tab's WebEngineView
+        to stop loading the page.
+        """
         self.tabs.currentWidget().stop()
 
     def handle_download_request(self, download):
         # Forward download to the current page
+        """
+        Forwards a download request to the current page.
+
+        The download request is processed by the current page's
+        `handle_download` method.
+
+        :param download: The download request
+        :type download: QWebEngineDownloadItem
+        """
         current_page = self.tabs.currentWidget().page()
         current_page.handle_download(download)
 
