@@ -21,7 +21,7 @@ Install the Python dependencies:
 
 `% pip install -r requirements.txt`
 
-## Install and run the ZERO search engine
+## Run the ZERO search engine
 
 Go to the `zero-search-engine` folder
 
@@ -33,7 +33,7 @@ Run the search engine (as a development project):
 
 `% flask --debug run --port 5001`
 
-## Install and run the ZERO browser<sup>1,2,3</sup>
+## Run the ZERO browser<sup>1,2,3</sup>
 
 Make sure that the search engine is running in the background.
 Go to the `zero-browser` folder:
